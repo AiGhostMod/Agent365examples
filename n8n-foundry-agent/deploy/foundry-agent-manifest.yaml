@@ -1,0 +1,49 @@
+# Microsoft Foundry Agent Manifest for the n8n agent.
+# Used to onboard this agent to the Foundry Agent Service.
+#
+# Deploy via Foundry portal or CLI:
+#   az ai foundry agent create --manifest deploy/foundry-agent-manifest.yaml
+
+apiVersion: foundry.azure.com/v1
+kind: Agent
+metadata:
+  name: n8n-foundry-agent
+  displayName: n8n Foundry Agent
+  description: >
+    n8n workflow-based agent powered by Azure AI Foundry GPT 5.2.
+    Wrapped in Microsoft Agent 365 SDK for enterprise identity, observability,
+    and governance. Supports knowledge search, task creation, and general Q&A.
+spec:
+  framework: n8n
+  runtime:
+    type: container
+    image: "${CONTAINER_REGISTRY}/n8n-foundry-agent:latest"
+    ports:
+      - 8001  # Agent365 wrapper
+      - 5678  # n8n (internal)
+  model:
+    deployment: gpt-5.2
+    provider: azure_openai
+  capabilities:
+    - chat
+    - tool_use
+    - knowledge_search
+    - task_creation
+  tools:
+    - name: get_current_time
+      description: Get the current date and time
+    - name: search_knowledge_base
+      description: Search internal knowledge base
+    - name: create_task
+      description: Create a new task or work item
+  identity:
+    type: entra_managed
+    agent365:
+      enabled: true
+  observability:
+    tracing: true
+    metrics: true
+    applicationInsights: true
+  scaling:
+    minInstances: 1
+    maxInstances: 5

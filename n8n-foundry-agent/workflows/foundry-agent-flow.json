@@ -1,0 +1,203 @@
+{
+  "name": "Azure Foundry GPT 5.2 Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "agent",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-trigger",
+      "name": "Webhook Trigger",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 300],
+      "webhookId": "foundry-agent-webhook"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "id": "ai-agent",
+      "name": "AI Agent",
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [600, 300]
+    },
+    {
+      "parameters": {
+        "resource": "azureOpenAiApi",
+        "modelId": {
+          "__rl": true,
+          "value": "={{ $env.AZURE_OPENAI_DEPLOYMENT || 'gpt-5.2' }}",
+          "mode": "id"
+        },
+        "options": {
+          "temperature": 0,
+          "maxTokens": 4096
+        }
+      },
+      "id": "azure-openai-chat",
+      "name": "Azure OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAzureOpenAi",
+      "typeVersion": 1,
+      "position": [400, 500],
+      "credentials": {
+        "azureOpenAiApi": {
+          "id": "azure-foundry-credential",
+          "name": "Azure AI Foundry GPT 5.2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "contextWindowLength": 16384
+      },
+      "id": "memory",
+      "name": "Window Buffer Memory",
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [600, 500]
+    },
+    {
+      "parameters": {
+        "name": "get_current_time",
+        "description": "Get the current date and time in ISO format",
+        "code": "return new Date().toISOString();"
+      },
+      "id": "tool-time",
+      "name": "Get Current Time",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.1,
+      "position": [400, 700]
+    },
+    {
+      "parameters": {
+        "name": "search_knowledge_base",
+        "description": "Search the internal knowledge base for relevant information. Input: a search query string.",
+        "code": "const query = $input.first().json.query || $input.first().json;\nreturn JSON.stringify({\n  results: [{\n    title: `Result for: ${query}`,\n    snippet: 'Placeholder knowledge base result. Connect to Azure AI Search for production use.',\n    score: 0.95\n  }],\n  source: 'azure-ai-search'\n});"
+      },
+      "id": "tool-search",
+      "name": "Search Knowledge Base",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.1,
+      "position": [600, 700]
+    },
+    {
+      "parameters": {
+        "name": "create_task",
+        "description": "Create a new task or work item. Input should include title, description, and priority (low/medium/high).",
+        "code": "const input = $input.first().json;\nreturn JSON.stringify({\n  status: 'created',\n  task_id: 'TASK-' + Math.floor(Math.random() * 1000),\n  title: input.title || 'New Task',\n  description: input.description || '',\n  priority: input.priority || 'medium'\n});"
+      },
+      "id": "tool-task",
+      "name": "Create Task",
+      "type": "@n8n/n8n-nodes-langchain.toolCode",
+      "typeVersion": 1.1,
+      "position": [800, 700]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ response: $json.output, session_id: $json.sessionId || 'n8n-session', agent_id: $env.AGENT365_AGENT_ID || 'n8n-foundry-agent-001', model: $env.AZURE_OPENAI_DEPLOYMENT || 'gpt-5.2' }) }}"
+      },
+      "id": "respond",
+      "name": "Respond to Webhook",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1000, 300]
+    }
+  ],
+  "connections": {
+    "Webhook Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Azure OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Current Time": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Search Knowledge Base": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create Task": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "tags": [
+    {
+      "name": "azure-foundry",
+      "id": "tag-azure-foundry"
+    },
+    {
+      "name": "agent365",
+      "id": "tag-agent365"
+    }
+  ]
+}

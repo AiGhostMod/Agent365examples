@@ -1,0 +1,25 @@
+{
+  "name": "n8n-foundry-agent",
+  "version": "0.1.0",
+  "description": "n8n agent workflow using Azure AI Foundry GPT 5.2, wrapped in Microsoft Agent 365 SDK",
+  "private": true,
+  "scripts": {
+    "start": "node agent365-wrapper/server.mjs",
+    "n8n:start": "n8n start",
+    "n8n:import": "n8n import:workflow --input=workflows/foundry-agent-flow.json",
+    "setup": "npm install && npm run n8n:import"
+  },
+  "dependencies": {
+    "n8n": "^1.70.0",
+    "@azure/identity": "^4.5.0",
+    "@azure/monitor-opentelemetry": "^1.8.0",
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/sdk-node": "^0.56.0",
+    "@opentelemetry/sdk-trace-base": "^1.28.0",
+    "express": "^4.21.0",
+    "dotenv": "^16.4.0"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.0"
+  }
+}

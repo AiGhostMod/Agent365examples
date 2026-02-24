@@ -1,0 +1,52 @@
+# Microsoft Foundry Agent Manifest
+# Used to onboard this agent to the Foundry Agent Service hosted agents feature.
+#
+# Deploy via Foundry portal or CLI:
+#   az ai foundry agent create --manifest deploy/foundry-agent-manifest.yaml
+#
+# Reference: https://learn.microsoft.com/en-us/azure/ai-foundry/how-to/develop/create-agent
+
+apiVersion: foundry.azure.com/v1
+kind: Agent
+metadata:
+  name: langgraph-foundry-agent
+  displayName: LangGraph Foundry Agent
+  description: >
+    ReAct-style agent built with LangGraph, powered by Azure AI Foundry GPT 5.2.
+    Wrapped in Microsoft Agent 365 SDK for enterprise identity, observability,
+    and governance. Supports knowledge search, task creation, and general Q&A.
+spec:
+  framework: langgraph
+  runtime:
+    type: hosted  # Foundry-managed hosting (no containers needed)
+    entrypoint: src.server:app
+    python:
+      version: "3.11"
+      requirements: pyproject.toml
+  model:
+    deployment: gpt-5.2
+    provider: azure_openai
+  capabilities:
+    - chat
+    - tool_use
+    - knowledge_search
+    - task_creation
+  tools:
+    - name: get_current_time
+      description: Get the current date and time
+    - name: search_knowledge_base
+      description: Search internal knowledge base
+    - name: create_task
+      description: Create a new task or work item
+  identity:
+    type: entra_managed
+    # Agent 365 Entra-backed identity
+    agent365:
+      enabled: true
+  observability:
+    tracing: true
+    metrics: true
+    applicationInsights: true
+  scaling:
+    minInstances: 1
+    maxInstances: 5

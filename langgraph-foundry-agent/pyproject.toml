@@ -1,0 +1,46 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.backends.build"
+
+[project]
+name = "langgraph-foundry-agent"
+version = "0.1.0"
+description = "LangGraph agent using Azure AI Foundry GPT 5.2, wrapped in Microsoft Agent 365 SDK"
+requires-python = ">=3.11"
+dependencies = [
+    # LangGraph agent core
+    "langgraph>=0.2.0",
+    "langchain-openai>=0.2.0",
+    "langchain-core>=0.3.0",
+
+    # Azure AI Foundry - unified SDK (agents, inference, eval, telemetry)
+    "azure-ai-projects>=2.0.0b3",
+    "azure-identity>=1.19.0",
+
+    # Microsoft Agent 365 SDK - enterprise wrapper (identity, observability, notifications)
+    "microsoft-agents-a365-hosting>=0.1.0",
+    "microsoft-agents-a365-observability>=0.1.0",
+
+    # Tracing / Observability pipeline
+    "opentelemetry-api>=1.28.0",
+    "opentelemetry-sdk>=1.28.0",
+    "azure-monitor-opentelemetry>=1.6.0",
+    "azure-core-tracing-opentelemetry>=1.0.0b12",
+
+    # Server
+    "pydantic>=2.0",
+    "fastapi>=0.115.0",
+    "uvicorn>=0.32.0",
+    "python-dotenv>=1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24.0",
+    "ruff>=0.8.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
