@@ -11,15 +11,19 @@ metadata:
   displayName: n8n Foundry Agent
   description: >
     n8n workflow-based agent powered by Azure AI Foundry GPT 5.2.
-    Wrapped in Microsoft Agent 365 SDK for enterprise identity, observability,
-    and governance. Supports knowledge search, task creation, and general Q&A.
+    Python Agent365 wrapper provides enterprise identity, observability,
+    and governance via the Microsoft Agent 365 SDK.
 spec:
   framework: n8n
   runtime:
     type: container
     image: "${CONTAINER_REGISTRY}/n8n-foundry-agent:latest"
+    entrypoint: python -m agent365_wrapper.server
+    python:
+      version: "3.11"
+      requirements: pyproject.toml
     ports:
-      - 8001  # Agent365 wrapper
+      - 8001  # Agent365 Python wrapper
       - 5678  # n8n (internal)
   model:
     deployment: gpt-5.2

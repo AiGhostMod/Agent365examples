@@ -1,0 +1,41 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.backends.build"
+
+[project]
+name = "n8n-foundry-agent"
+version = "0.1.0"
+description = "n8n agent workflow using Azure AI Foundry GPT 5.2, wrapped in Microsoft Agent 365 SDK"
+requires-python = ">=3.11"
+dependencies = [
+    # Agent 365 SDK wrapper server
+    "fastapi>=0.115.0",
+    "uvicorn>=0.32.0",
+    "httpx>=0.27.0",
+    "python-dotenv>=1.0.0",
+    "pydantic>=2.0",
+
+    # Microsoft Agent 365 SDK (Frontier preview)
+    "microsoft-agents-a365-hosting>=0.1.0",
+    "microsoft-agents-a365-observability>=0.1.0",
+
+    # Azure identity
+    "azure-identity>=1.19.0",
+
+    # Tracing / Observability pipeline
+    "opentelemetry-api>=1.28.0",
+    "opentelemetry-sdk>=1.28.0",
+    "azure-monitor-opentelemetry>=1.6.0",
+    "azure-core-tracing-opentelemetry>=1.0.0b12",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-asyncio>=0.24.0",
+    "ruff>=0.8.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"

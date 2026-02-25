@@ -11,7 +11,7 @@ onboarding to [Microsoft Foundry](https://learn.microsoft.com/en-us/azure/ai-fou
 | Folder | Agent Framework | Description |
 |--------|----------------|-------------|
 | [`langgraph-foundry-agent/`](./langgraph-foundry-agent/) | LangGraph (Python) | ReAct agent with LangGraph state graph, AzureChatOpenAI, and FastAPI server |
-| [`n8n-foundry-agent/`](./n8n-foundry-agent/) | n8n (Node.js) | Visual workflow agent with n8n AI Agent node, Express wrapper server |
+| [`n8n-foundry-agent/`](./n8n-foundry-agent/) | n8n + Python wrapper | Visual workflow agent with n8n AI Agent node, Python FastAPI wrapper server |
 
 ## Architecture
 
@@ -49,7 +49,7 @@ Both agents export traces to Azure Application Insights using:
 
 - **OpenTelemetry** with GenAI semantic conventions (`gen_ai.*` attributes)
 - **Azure Monitor exporter** for Application Insights integration
-- **azure-ai-projects telemetry** (Python agent) for Foundry SDK-level instrumentation
+- **azure-ai-projects telemetry** (LangGraph agent) for Foundry SDK-level instrumentation
 - **Foundry portal** reads traces from App Insights for agent monitoring dashboards
 
 ## Foundry Onboarding
@@ -60,11 +60,13 @@ agents feature (no containers needed); the n8n agent deploys as a container.
 
 ## Prerequisites
 
+- Python 3.11+
 - Azure subscription with Azure AI Foundry project
 - GPT 5.2 model deployment in the Foundry project
 - Application Insights resource (for tracing)
 - [Agent 365 Frontier preview access](https://learn.microsoft.com/en-us/microsoft-agent-365/developer/agent-365-sdk) (optional, runs standalone without it)
 - Entra ID app registration with Microsoft Graph delegated permissions (for Agent 365)
+- Node.js 20+ and n8n (for the n8n agent only; the wrapper itself is Python)
 
 ---
 

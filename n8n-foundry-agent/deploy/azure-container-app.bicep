@@ -1,6 +1,6 @@
 // Azure Container App deployment for the n8n Foundry Agent.
 // Deploys to Azure Container Apps with the n8n workflow engine and
-// Agent365 wrapper server.
+// Python Agent365 wrapper server.
 //
 // Deploy:
 //   az deployment group create \
