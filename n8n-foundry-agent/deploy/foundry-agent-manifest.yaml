@@ -18,7 +18,7 @@ spec:
   runtime:
     type: container
     image: "${CONTAINER_REGISTRY}/n8n-foundry-agent:latest"
-    entrypoint: python -m agent365_wrapper.server
+    entrypoint: agent365_server:app
     python:
       version: "3.11"
       requirements: pyproject.toml

@@ -15,31 +15,27 @@ onboarding to [Microsoft Foundry](https://learn.microsoft.com/en-us/azure/ai-fou
 
 ## Architecture
 
-Both agents follow the same pattern:
+Both agents follow the same pattern - a single `agent365_server.py` that
+handles all platform integration, with the agent logic kept separate:
 
 ```
 Client Request
-    │
-    ▼
-┌──────────────────────────────┐
-│  Agent 365 SDK Wrapper       │  ← Entra identity, observability, lifecycle
-│  (tracing, registration)     │
-└──────────┬───────────────────┘
-           │
-           ▼
-┌──────────────────────────────┐
-│  Agent Logic                 │  ← LangGraph graph / n8n workflow
-│  (LLM calls, tool use,      │     ALL agent logic lives here
-│   memory, reasoning)         │     Zero knowledge of Agent 365
-└──────────┬───────────────────┘
-           │
-           ▼
-┌──────────────────────────────┐
-│  Azure AI Foundry GPT 5.2   │  ← Model deployment
-└──────────────────────────────┘
+    |
+    v
+agent365_server.py                    <-- single file: tracing + Agent 365
+    |  - OTel tracing -> Azure Monitor    registration + FastAPI endpoints
+    |  - Agent 365 register/deregister
+    |  - /invoke and /health endpoints
+    |
+    v
+Agent Logic                           <-- LangGraph graph / n8n workflow
+    (LLM calls, tool use, memory)         zero knowledge of Agent 365
+    |
+    v
+Azure AI Foundry GPT 5.2              <-- model deployment
 ```
 
-The Agent 365 SDK wraps the agent - it does not implement the agent logic.
+The Agent 365 server wraps the agent - it does not implement the agent logic.
 The actual reasoning, tool calling, and memory management are handled entirely
 by LangGraph or n8n respectively.
 

@@ -1,7 +1,7 @@
 """Tests for the LangGraph agent graph construction."""
 
-from src.agent.graph import AgentState, build_agent_graph
-from src.agent.tools import ALL_TOOLS
+from agent.graph import AgentState, build_agent_graph
+from agent.tools import ALL_TOOLS
 
 
 def test_tools_defined():

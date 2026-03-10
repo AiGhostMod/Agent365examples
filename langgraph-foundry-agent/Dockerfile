@@ -5,8 +5,9 @@ WORKDIR /app
 COPY pyproject.toml .
 RUN pip install --no-cache-dir .
 
-COPY src/ src/
+COPY agent/ agent/
+COPY agent365_server.py .
 
 EXPOSE 8000
 
-CMD ["python", "-m", "src.server"]
+CMD ["python", "agent365_server.py"]

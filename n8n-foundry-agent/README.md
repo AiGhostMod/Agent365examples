@@ -3,7 +3,7 @@
 Visual workflow agent built with [n8n](https://n8n.io/), powered by Azure AI
 Foundry GPT 5.2, wrapped in the
 [Microsoft Agent 365 SDK](https://learn.microsoft.com/en-us/microsoft-agent-365/developer/agent-365-sdk)
-via a Python FastAPI server.
+via a single Python server script.
 
 ## Quick Start
 
@@ -12,7 +12,7 @@ via a Python FastAPI server.
 cp .env.example .env
 # Edit .env with your Azure OpenAI endpoint, key, and credentials
 
-# 2. Install Python wrapper dependencies
+# 2. Install Python dependencies
 pip install -e .
 
 # 3. Install n8n (requires Node.js 20+)
@@ -26,9 +26,9 @@ n8n start
 # n8n UI at http://localhost:5678
 # Configure Azure OpenAI credentials in the n8n UI
 
-# 6. Start Agent365 Python wrapper (in another terminal)
-python -m agent365_wrapper.server
-# Wrapper at http://localhost:8001
+# 6. Start Agent365 server (in another terminal)
+python agent365_server.py
+# Server at http://localhost:8001
 
 # 7. Test
 curl -X POST http://localhost:8001/invoke \
@@ -42,7 +42,7 @@ curl -X POST http://localhost:8001/invoke \
 Client (port 8001)
     |
     v
-Agent365 Wrapper Server (Python / FastAPI)
+agent365_server.py (Python / FastAPI)
     |  - OpenTelemetry tracing
     |  - Agent 365 registration/lifecycle
     |  - Session correlation
@@ -65,14 +65,9 @@ n8n AI Agent Workflow
 n8n-foundry-agent/
 |-- workflows/
 |   +-- foundry-agent-flow.json     # n8n workflow (ALL agent logic)
-|-- agent365_wrapper/               # Agent 365 SDK integration (Python)
-|   |-- __init__.py
-|   |-- server.py                   #   FastAPI server (proxies to n8n)
-|   |-- sdk.py                      #   Agent 365 client (registration, lifecycle)
-|   |-- wrapper.py                  #   Wraps n8n agent with Agent 365
-|   +-- tracing.py                  #   OpenTelemetry + Azure Monitor
-|-- tests/
-|   +-- test_wrapper.py
+|-- agent365_server.py              # Single-file Agent 365 server
+|                                   #   Tracing, registration, /invoke, /health
+|                                   #   Proxies to n8n webhook
 |-- deploy/
 |   |-- azure-container-app.bicep   # Azure Container Apps deployment
 |   +-- foundry-agent-manifest.yaml # Foundry Agent Service manifest
@@ -86,10 +81,8 @@ n8n-foundry-agent/
 ### Azure Container Apps
 
 ```bash
-# Build and push
 az acr build --registry <acr> --image n8n-foundry-agent:latest .
 
-# Deploy
 az deployment group create \
   --resource-group <rg> \
   --template-file deploy/azure-container-app.bicep \

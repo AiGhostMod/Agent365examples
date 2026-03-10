@@ -1,9 +1,8 @@
 """LangGraph agent graph using Azure AI Foundry GPT 5.2.
 
 This is the actual agent logic - a ReAct-style agent built with LangGraph that
-uses Azure AI Foundry's GPT 5.2 deployment for reasoning. The Agent365 SDK
-wrapper sits _outside_ this module and delegates to it; this module has zero
-knowledge of Agent365.
+uses Azure AI Foundry's GPT 5.2 deployment for reasoning. agent365_server.py
+imports run_agent() from here - this module has zero knowledge of Agent365.
 """
 
 from __future__ import annotations

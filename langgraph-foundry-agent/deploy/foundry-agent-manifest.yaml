@@ -19,7 +19,7 @@ spec:
   framework: langgraph
   runtime:
     type: hosted  # Foundry-managed hosting (no containers needed)
-    entrypoint: src.server:app
+    entrypoint: agent365_server:app
     python:
       version: "3.11"
       requirements: pyproject.toml
